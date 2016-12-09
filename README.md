@@ -10,8 +10,8 @@ HTML5 CANVAS를 이용한 뉴스속보 합성 이미지 만들기 웹 사이트 
 6. (참고 2) GitHub - https://github.com/myeonguni/BreakingNews_CreateImg
 
 ## 스크린샷
-<img width="200px" height="200px">
-![Alt text](/screenshot.JPG)</img>
+<img src="/screentshot.JPG" width="295px" height="396px"></img>
+![Alt text](/screenshot.JPG)
 
 ## 개발환경
 1. 사용언어 : HTML5/CSS, JAVSCRIPT
