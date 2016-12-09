@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+	<title>명우니닷컴 :: 뉴스 속보 이미지 만들기</title>
+	<!-- bootstrap css -->
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<!-- jquery js -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<!-- bootstrap js -->
+	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div style="position:absolute; width:702px; left:50%; margin-left:-351px;">
+		<!-- DEFAULT NEWS TITLE -->
+		<div class="text-center">
+			<h2>
+				<div class="text-center">
+					<label class="control-label"><span class="glyphicon glyphicon-picture"></span>  뉴스속보 합성 이미지 만들기</label>
+				</div>
+			</h2>
+			<br/>
+		</div>
+		
+		<!-- DEFAULT NEWS CANVAS TAG-->
+		<div class="text-center">
+			<canvas id="myeonguniNewsCanvas" width="702" height="396" style="border:1px solid black">
+				<!-- 브라우저가 canvas 태그를 지원하지 않을 경우 표시-->
+				<div class="text-center">
+					<script>document.write("접속하신 브라우저는 지원하지 않습니다. 최신 브라우저로 업데이트 해주세요");</script>
+					<br><a href="http://windows.microsoft.com/ko-kr/internet-explorer/download-ie">접속하신 브라우저는 지원하지 않습니다. 최신 버전으로 업데이트 하기(클릭)</a><br><br>
+				</div>
+			</canvas>
+		</div>
+		<br/>
+
+		<!-- 뉴스속보 합성 생성 폼 -->
+		<form action="" method="">
+			<hr/>
+			<!-- 뉴스속보 배경 이미지 -->
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">① 배경 이미지</label>
+				<div class="col-sm-10">
+					<input type="file" id="fileName" name="file" disabled onchange="fileUpload(this);">
+				</div>
+			</div>
+			<!-- 뉴스속보 텍스트 -->
+			<div class="form-group row">
+				<label for="inputNumber" class="col-sm-2 col-form-label">② 텍스트</label>
+				<div class="col-sm-10">
+					<!-- 텍스트를 입력할때마다(onkyup Event) createNews() 호출 -->
+					<input type="text" class="form-control" id="inputText" name="text" placeholder="합성할 뉴스특보 문구를 입력해주세요" onkeyup="createNews(this.value);">
+				</div>
+			</div>
+		</form>
+		<hr/>
+
+		<!-- CREATE NEWS CANVAS TAG-->
+		<div class="text-center">
+			<canvas id="newNewsCanvas" width="702" height="396" style="border:1px solid black">
+				<!-- 브라우저가 canvas 태그를 지원하지 않을 경우 표시-->
+				<div class="text-center">
+					<script>document.write("접속하신 브라우저는 지원하지 않습니다. 최신 브라우저로 업데이트 해주세요");</script>
+					<br><a href="http://windows.microsoft.com/ko-kr/internet-explorer/download-ie">접속하신 브라우저는 지원하지 않습니다. 최신 버전으로 업데이트 하기(클릭)</a><br><br>
+				</div>
+			</canvas>
+		</div>
+
+		<!-- 생성한 뉴스속보 이미지 파일 저장 버튼 -->
+		<div class="text-center">
+			<br/>
+			<a id="news_download">
+				<button type="button" class="btn btn-default btn-sm">
+					<span class="glyphicon glyphicon-download-alt"></span> Download
+				</button>
+			</a>
+			<hr/>
+		</div>
+	</div>
+
+	<!-- 스크립트 -->
+	<script>
+		/* 페이지 로드 시 초기화 작업 진행 */ 
+		$(function() {
+			/* 기본 뉴스 CANVAS 초기화 */
+			init_defalut_canvas();
+
+			/* 생성할 뉴스 CANVAS 초기화 */
+			createNews('텍스트를 입력해주세요.');
+
+			/* 생성한 뉴스 이미지 다운로드 */
+			$("#news_download").click(function() {
+				this.href = document.getElementById('newNewsCanvas').toDataURL();
+				this.download = 'news.png';
+			});
+		});
+
+		// 기본 뉴스 CANVAS 초기화 함수
+		function init_defalut_canvas(){
+			// canvas 요소 가져오기
+			var canvas = document.getElementById('myeonguniNewsCanvas');
+			// canvas의 context 가져오기
+			var context = canvas.getContext('2d');
+
+
+			/* DEFALUT NEWS CANVAS */
+			// 이미지(뉴스배경) 불러오기
+			var img_news_background = new Image();
+			// 기본 뉴스 배경 이미지 설정
+			img_news_background.src = "img/img_news_background_winter.jpg";
+			// 크리스마스 뉴스 배경 이미지 설정
+			//img_news_background.src = "img/img_news_background_christmas.jpg";
+
+			// 이미지(뉴스자막) 불러오기
+			var img_news_text = new Image();
+			// 기본 뉴스 자막 이미지 설정
+			img_news_text.src = "img/img_news_text.png";
+
+
+	 		// 이미지(뉴스배경) 로드되면 canvas에 방송사, 이미지(배경,자막), 자막 그리기
+			img_news_background.onload = function() {
+				// 이미지(뉴스배경) 그리기 - x : y : width : height
+				context.drawImage(img_news_background, 1, 1, 700, 394);
+				// 이미지(뉴스자막) 그리기 - x : y : width : height
+				context.drawImage(img_news_text, 1, 1, 700, 394);
+
+				// 글씨(방송사) 론트, 색상 설정 및 그리기
+				context.font = '12px Calibri';
+		      	context.fillStyle = 'white';
+				context.fillText('MYEONGUNI.COM', 598, 22);
+
+				// 글씨(뉴스자막) 론트, 색상 설정 및 그리기
+				context.font = 'italic 25px Calibri';
+		      	context.fillStyle = 'white';
+				context.fillText('[속보] 명우니닷컴 뉴스 속보 합성 페이지 오픈!', 150, 355);
+			}
+		}
+
+		// 합성파일을 생성하기 버튼을 눌렀을 시
+		function createNews(inputText){
+			// canvas 요소와 context 가져오기
+			var canvas = document.getElementById('newNewsCanvas');
+			var context = canvas.getContext('2d');
+			// 새로운 이미지(뉴스배경) 불러오기
+			var img_news_background = new Image();
+			// 새로운 뉴스 배경 이미지 설정
+			img_news_background.src = "img/img_news_background_christmas.jpg";
+			// 새로운 이미지(뉴스자막) 불러오기
+			var img_news_text = new Image();
+			// 새로운 뉴스 자막 이미지 설정
+			img_news_text.src = "img/img_news_text.png";
+			// 이미지(뉴스배경) 로드되면 canvas에 방송사, 이미지(배경,자막), 자막 그리기
+			img_news_background.onload = function() {
+				// 이미지(뉴스배경) 그리기 - x : y : width : height
+				context.drawImage(img_news_background, 1, 1, 700, 394);
+				// 이미지(뉴스자막) 그리기 - x : y : width : height
+				context.drawImage(img_news_text, 1, 1, 700, 394);
+				// 글씨(방송사) 론트, 색상 설정 및 그리기
+				context.font = '12px Calibri';
+		      	context.fillStyle = 'white';
+				context.fillText('MYEONGUNI.COM', 598, 22);
+				// 글씨(뉴스자막) 론트, 색상 설정 및 그리기
+				context.font = 'italic 25px Calibri';
+		      	context.fillStyle = 'white';
+				context.fillText(inputText, 150, 355);
+			}
+			console.log(inputText.value);
+		}
+	</script> 
+</body>
+</html>
