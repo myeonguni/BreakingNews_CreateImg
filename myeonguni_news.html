@@ -44,7 +44,7 @@
 			<div class="form-group row">
 				<label class="col-sm-2 col-form-label">① 배경 이미지</label>
 				<div class="col-sm-10">
-					<input type="file" id="fileName" name="file" disabled onchange="fileUpload(this);">
+					<input type="file" id="fileName" name="file" onchange="createNewsImg(this);" />
 				</div>
 			</div>
 			<!-- 뉴스속보 텍스트 -->
@@ -52,7 +52,7 @@
 				<label for="inputNumber" class="col-sm-2 col-form-label">② 텍스트</label>
 				<div class="col-sm-10">
 					<!-- 텍스트를 입력할때마다(onkyup Event) createNews() 호출 -->
-					<input type="text" class="form-control" id="inputText" name="text" placeholder="합성할 뉴스특보 문구를 입력해주세요" onkeyup="createNews(this.value);">
+					<input type="text" class="form-control" id="inputText" name="text" placeholder="합성할 뉴스특보 문구를 입력해주세요" onkeyup="createNews(this.value);" />
 				</div>
 			</div>
 		</form>
@@ -82,8 +82,34 @@
 					<span class="glyphicon glyphicon-link"></span> GitHub
 				</button>
 			</a>
+			<br/><br/>
+			<p>(모바일의 경우 - ①다운로드 버튼 클릭 → ②이미지를 길게 눌름 → ③이미지 저장)</p>
+
 			<hr/>
 		</div>
+
+		<!-- 샘플 뉴스속보 이미지 -->
+		<div class="row">
+			<div class="col-xs-6 col-md-4 text-center" style="padding-bottom: 30px">
+				<img src="img/sample/img_sample1.jpg" width="300px" class="img-thumbnail">
+			</div>
+			<div class="col-xs-6 col-md-4 text-center" style="padding-bottom: 30px">
+				<img src="img/sample/img_sample2.jpg" width="300px" class="img-thumbnail">
+			</div>
+			<div class="col-xs-6 col-md-4 text-center" style="padding-bottom: 30px">
+				<img src="img/sample/img_sample3.jpg" width="300px" class="img-thumbnail">
+			</div>
+			<div class="col-xs-6 col-md-4 text-center" style="padding-bottom: 30px">
+				<img src="img/sample/img_sample4.jpg" width="300px" class="img-thumbnail">
+			</div>
+			<div class="col-xs-6 col-md-4 text-center" style="padding-bottom: 30px">
+				<img src="img/sample/img_sample5.jpg" width="300px" class="img-thumbnail">
+			</div>
+			<div class="col-xs-6 col-md-4 text-center" style="padding-bottom: 30px">
+				<img src="img/sample/img_sample6.jpg" width="300px" class="img-thumbnail">
+			</div>
+		</div>
+
 	</div>
 
 	<!-- 스크립트 -->
@@ -94,7 +120,7 @@
 			init_defalut_canvas();
 
 			/* 생성할 뉴스 CANVAS 초기화 */
-			createNews('텍스트를 입력해주세요.');
+			createNews('');
 
 			/* 생성한 뉴스 이미지 다운로드 */
 			$("#news_download").click(function() {
@@ -110,20 +136,16 @@
 			// canvas의 context 가져오기
 			var context = canvas.getContext('2d');
 
-
 			/* DEFALUT NEWS CANVAS */
 			// 이미지(뉴스배경) 불러오기
 			var img_news_background = new Image();
-			// 기본 뉴스 배경 이미지 설정
-			img_news_background.src = "img/img_news_background_winter.jpg";
-			// 크리스마스 뉴스 배경 이미지 설정
-			//img_news_background.src = "img/img_news_background_christmas.jpg";
+			// 기본 뉴스 배경 이미지 설정(크리스마스)
+			img_news_background.src = "img/img_news_background_christmas.jpg";
 
 			// 이미지(뉴스자막) 불러오기
 			var img_news_text = new Image();
 			// 기본 뉴스 자막 이미지 설정
 			img_news_text.src = "img/img_news_text.png";
-
 
 	 		// 이미지(뉴스배경) 로드되면 canvas에 방송사, 이미지(배경,자막), 자막 그리기
 			img_news_background.onload = function() {
@@ -144,25 +166,47 @@
 			}
 		}
 
-		// 합성파일을 생성하기 버튼을 눌렀을 시
+
+		/** 생성할 뉴스 자막 이미지 전역변수 선언 **/
+		var createNews_text_img = new Image();
+
+		/* 생성할 뉴스 자막 초기 설정 */
+		createNews_text_img.src = "img/img_news_text.png";
+
+		/** 생성할 뉴스 배경화면 이미지 전역변수 선언 **/
+		var createNews_background_img = new Image();
+
+		/* 생성할 뉴스 배경화면 초기 설정 */
+		createNews_background_img.src = "img/img_news_background_homealone.jpg";
+
+		// 생성할 뉴스 배경 이미지 셋팅 : 배경화면 파일 업로드 시 
+		function createNewsImg(upload){
+			var file = upload.files[0];
+			reader = new FileReader();
+
+			reader.onload = function (event) {
+			    createNews_background_img.src = event.target.result;
+			    createNews($("#inputText").val());
+			};
+			reader.readAsDataURL(file);
+			return false;
+		}
+
+		// 생성할 뉴스 CANVAS 그려주기 : 텍스트 변경 혹은 배경 이미지 변경 시
 		function createNews(inputText){
 			// canvas 요소와 context 가져오기
 			var canvas = document.getElementById('newNewsCanvas');
 			var context = canvas.getContext('2d');
-			// 새로운 이미지(뉴스배경) 불러오기
-			var img_news_background = new Image();
-			// 새로운 뉴스 배경 이미지 설정
-			img_news_background.src = "img/img_news_background_christmas.jpg";
-			// 새로운 이미지(뉴스자막) 불러오기
-			var img_news_text = new Image();
-			// 새로운 뉴스 자막 이미지 설정
-			img_news_text.src = "img/img_news_text.png";
+			// 배경 이미지 선언 및 설정
+			var createNews_back_img = new Image();
+			createNews_back_img.src = createNews_background_img.src;
+
 			// 이미지(뉴스배경) 로드되면 canvas에 방송사, 이미지(배경,자막), 자막 그리기
-			img_news_background.onload = function() {
+			createNews_back_img.onload = function() {
 				// 이미지(뉴스배경) 그리기 - x : y : width : height
-				context.drawImage(img_news_background, 1, 1, 700, 394);
+				context.drawImage(createNews_back_img, 1, 1, 700, 394);
 				// 이미지(뉴스자막) 그리기 - x : y : width : height
-				context.drawImage(img_news_text, 1, 1, 700, 394);
+				context.drawImage(createNews_text_img, 1, 1, 700, 394);
 				// 글씨(방송사) 론트, 색상 설정 및 그리기
 				context.font = '12px Calibri';
 		      	context.fillStyle = 'white';
@@ -170,9 +214,17 @@
 				// 글씨(뉴스자막) 론트, 색상 설정 및 그리기
 				context.font = 'italic 25px Calibri';
 		      	context.fillStyle = 'white';
-				context.fillText(inputText, 150, 355);
+		      	// (inputText)텍스트 입력이 없을 경우
+		      	if (inputText == "")
+		      	{
+		      		context.fillText("텍스트를 입력해주세요.", 150, 355);
+		      	}
+		      	// (inputText)텍스트 입력이 있을 경우
+		      	else
+		      	{
+					context.fillText(inputText, 150, 355);
+		      	}
 			}
-			console.log(inputText.value);
 		}
 	</script> 
 </body>
